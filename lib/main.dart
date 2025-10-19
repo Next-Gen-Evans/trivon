@@ -24,7 +24,7 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orange, // whole page orange
+      backgroundColor: Colors.orange,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -213,8 +213,7 @@ class _QuizPageState extends State<QuizPage> {
       if (secondsLeft > 0) {
         setState(() {
           secondsLeft--;
-          timerColor =
-              secondsLeft % 2 == 0 ? Colors.red : Colors.blue; // change color
+          timerColor = secondsLeft % 2 == 0 ? Colors.red : Colors.blue;
         });
       } else {
         nextQuestion();
@@ -249,66 +248,163 @@ class _QuizPageState extends State<QuizPage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final q = questions[currentQuestion];
-    return Scaffold(
-      backgroundColor: Colors.teal,
-      appBar: AppBar(
-        backgroundColor: Colors.teal,
-        elevation: 0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget buildOption(String letter, String text, Color color, bool correct) {
+    return GestureDetector(
+      onTap: () => answerQuestion(correct),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Row(
           children: [
-            Text("Q${currentQuestion + 1}/${questions.length}"),
-            Row(
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                      color: timerColor,
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Text(
-                    "$secondsLeft s",
-                    style: const TextStyle(color: Colors.white),
-                  ),
+            CircleAvatar(
+              backgroundColor: color,
+              radius: 18,
+              child: Text(
+                letter,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(width: 10),
-                Text("Score: $score"),
-              ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                text,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
             ),
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final q = questions[currentQuestion];
+    final answers = q['answers'] as List<Map<String, Object>>;
+    return Scaffold(
+      backgroundColor: Colors.orange,
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              q['question'] as String,
-              style: const TextStyle(
-                  fontSize: 22,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Stack(
+                children: [
+                  Container(
+                    height: 8,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 400),
+                    height: 8,
+                    width: MediaQuery.of(context).size.width *
+                        ((currentQuestion + 1) / questions.length),
+                    decoration: BoxDecoration(
+                      color: Colors.yellow,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(left: 15),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.teal[700],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    "Q${currentQuestion + 1}/${questions.length}",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(right: 15),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.teal[700],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    "Score: $score",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Center(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.yellow[600],
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.timer, color: Colors.black),
+                    const SizedBox(width: 6),
+                    Text(
+                      '$secondsLeft s',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 25),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                q['question'] as String,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
             ),
             const SizedBox(height: 20),
-            ...(q['answers'] as List<Map<String, Object>>).map((a) {
-              return Container(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: () => answerQuestion(a['correct'] as bool),
-                  child: Text(a['text'] as String,
-                      style: const TextStyle(color: Colors.black)),
-                ),
-              );
-            }),
+            Expanded(
+              child: ListView(
+                children: [
+                  buildOption('A', answers[0]['text'] as String, Colors.red,
+                      answers[0]['correct'] as bool),
+                  buildOption('B', answers[1]['text'] as String, Colors.blue,
+                      answers[1]['correct'] as bool),
+                  buildOption('C', answers[2]['text'] as String, Colors.green,
+                      answers[2]['correct'] as bool),
+                  buildOption('D', answers[3]['text'] as String, Colors.orange,
+                      answers[3]['correct'] as bool),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -325,14 +421,14 @@ class ResultPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.teal,
+      backgroundColor: Colors.orange,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.emoji_events, color: Colors.amber, size: 100),
+              const Icon(Icons.emoji_events, color: Colors.teal, size: 100),
               const SizedBox(height: 20),
               const Text("Quiz Completed!",
                   style: TextStyle(
@@ -341,14 +437,14 @@ class ResultPage extends StatelessWidget {
                       fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               Text("Your Score",
-                  style: TextStyle(color: Colors.white.withOpacity(0.8))),
+                  style: TextStyle(color: Colors.black.withOpacity(0.8))),
               const SizedBox(height: 10),
               Text(
                 "$score / $total\n${(score / total * 100).toStringAsFixed(0)}%",
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                     fontSize: 28,
-                    color: Colors.amber,
+                    color: Colors.black,
                     fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 40),
@@ -376,8 +472,8 @@ class ResultPage extends StatelessWidget {
                     icon: const Icon(Icons.refresh, color: Colors.black),
                     label: const Text('Retake',
                         style: TextStyle(color: Colors.black)),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amberAccent),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.white),
                   ),
                 ],
               )
