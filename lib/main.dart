@@ -106,6 +106,9 @@ class _QuizPageState extends State<QuizPage> {
   Color timerColor = Colors.red;
   Timer? timer;
 
+  int? selectedAnswerIndex;
+  bool? isCorrectAnswer;
+
   final List<Map<String, Object>> questions = [
     {
       'question': 'What is a StatefulWidget in Flutter?',
@@ -221,9 +224,21 @@ class _QuizPageState extends State<QuizPage> {
     });
   }
 
-  void answerQuestion(bool correct) {
-    if (correct) score++;
-    nextQuestion();
+  void answerQuestion(bool correct, int index) {
+    if (selectedAnswerIndex != null) return;
+    setState(() {
+      selectedAnswerIndex = index;
+      isCorrectAnswer = correct;
+      if (correct) score++;
+    });
+
+    Future.delayed(const Duration(seconds: 1), () {
+      nextQuestion();
+      setState(() {
+        selectedAnswerIndex = null;
+        isCorrectAnswer = null;
+      });
+    });
   }
 
   void nextQuestion() {
@@ -235,10 +250,11 @@ class _QuizPageState extends State<QuizPage> {
       startTimer();
     } else {
       Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (_) =>
-                  ResultPage(score: score, total: questions.length)));
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultPage(score: score, total: questions.length),
+        ),
+      );
     }
   }
 
@@ -248,14 +264,25 @@ class _QuizPageState extends State<QuizPage> {
     super.dispose();
   }
 
-  Widget buildOption(String letter, String text, Color color, bool correct) {
+  Widget buildOption(
+      String letter, String text, Color color, bool correct, int index) {
+    bool isSelected = selectedAnswerIndex == index;
+    Color boxColor = Colors.white;
+
+    // highlight colors
+    if (isSelected) {
+      boxColor = correct ? Colors.green.shade300 : Colors.red.shade300;
+    } else if (selectedAnswerIndex != null && correct) {
+      boxColor = Colors.green.shade200;
+    }
+
     return GestureDetector(
-      onTap: () => answerQuestion(correct),
+      onTap: () => answerQuestion(correct, index),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: boxColor,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: Colors.grey.shade300),
         ),
@@ -276,8 +303,10 @@ class _QuizPageState extends State<QuizPage> {
             Expanded(
               child: Text(
                 text,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
@@ -290,6 +319,7 @@ class _QuizPageState extends State<QuizPage> {
   Widget build(BuildContext context) {
     final q = questions[currentQuestion];
     final answers = q['answers'] as List<Map<String, Object>>;
+
     return Scaffold(
       backgroundColor: Colors.orange,
       body: SafeArea(
@@ -390,18 +420,30 @@ class _QuizPageState extends State<QuizPage> {
                     color: Colors.white),
               ),
             ),
+            if (isCorrectAnswer != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Text(
+                  isCorrectAnswer! ? '✔ Correct!' : '✖ Wrong!',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isCorrectAnswer! ? Colors.green : Colors.red,
+                  ),
+                ),
+              ),
             const SizedBox(height: 20),
             Expanded(
               child: ListView(
                 children: [
                   buildOption('A', answers[0]['text'] as String, Colors.red,
-                      answers[0]['correct'] as bool),
+                      answers[0]['correct'] as bool, 0),
                   buildOption('B', answers[1]['text'] as String, Colors.blue,
-                      answers[1]['correct'] as bool),
+                      answers[1]['correct'] as bool, 1),
                   buildOption('C', answers[2]['text'] as String, Colors.green,
-                      answers[2]['correct'] as bool),
-                  buildOption('D', answers[3]['text'] as String, Colors.orange,
-                      answers[3]['correct'] as bool),
+                      answers[2]['correct'] as bool, 2),
+                  buildOption('D', answers[3]['text'] as String, Colors.black,
+                      answers[3]['correct'] as bool, 3),
                 ],
               ),
             ),
