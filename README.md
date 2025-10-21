@@ -1,16 +1,33 @@
-# trivon
+# 🎯 Trivon App
 
-A new Flutter project.
+**Trivon** is a lightweight and interactive quiz application built with **Flutter**, inspired by **Kahoot**.  
+It allows users to participate in fun, time-based quizzes with a clean UI and smooth user experience.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🚀 Features
 
-A few resources to get you started if this is your first Flutter project:
+- 🧠 **Interactive Quizzes:** Multiple-choice questions with instant feedback.  
+- ⏱️ **Timer System:** Time-based questions to make gameplay exciting.  
+- 📊 **Score Tracking:** Calculates and displays final scores.  
+- 🎨 **Simple, Elegant UI:** Clean design for smooth user experience.  
+- 💥 **Dynamic Question Flow:** Moves automatically to the next question after submission.  
+- 🏆 **Results Summary:** Displays total score and performance at the end.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🧩 Tech Stack
+
+- **Framework:** Flutter (Dart)
+- **State Management:** setState / Provider (depending on your setup)
+- **UI Toolkit:** Material Design
+- **IDE:** Visual Studio Code / Android Studio
+
+---
+
+## ⚙️ Installation & Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Next-Gen-Evans/trivon.git
+   cd trivon
